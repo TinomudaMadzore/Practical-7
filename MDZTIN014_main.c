@@ -70,11 +70,6 @@ void main (void)
 // End of main
 
 //====================================================================
-// ISR DEFINITIONS
-//====================================================================
-
-
-//====================================================================
 // FUNCTION DEFINITIONS
 //====================================================================
 /*
@@ -99,7 +94,7 @@ void set_to_48MHz(void)
 void init_student(void){
     init_LCD();
     lcd_command(CLEAR);
-    lcd_putstring("MDZTIN014_test");
+    lcd_putstring("MDZTIN014");
 }
 
 void init_ADC(void){
@@ -130,12 +125,12 @@ void init_ADC(void){
 void init_TIM3(void){
     RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;  // Enable the TIM3 clock
 
-    // Set PB4 to alternate function mode, AF1 for TIM3 ch3 and ch4, (set to AF1 to connect to the PWM channels of TIM3)
-    RCC -> AHBENR |= RCC_AHBENR_GPIOBEN; // Ensure GPIOB clock is enabled
-    GPIOB -> MODER &= ~GPIO_MODER_MODER4; //clear bits first
-    GPIOB -> MODER |= GPIO_MODER_MODER4_1; // Set to AF mode
-    GPIOB -> AFR[0] &= ~(0xF << GPIO_AFRL_AFRL4_Pos); //clears the existing AF setting.
-    GPIOB -> AFR[0] |= (1 << GPIO_AFRL_AFRL4_Pos); // set to AF1
+    // Set PB0 to alternate function mode, AF1 for TIM3 CH3
+    RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+    GPIOB->MODER &= ~GPIO_MODER_MODER0;
+    GPIOB->MODER |= GPIO_MODER_MODER0_1;
+    GPIOB->AFR[0] &= ~(0xF << GPIO_AFRL_AFRL0_Pos);
+    GPIOB->AFR[0] |= (1 << GPIO_AFRL_AFRL0_Pos); // AF1 for TIM3_CH3
 
     // PWM mode on CH3
     TIM3 -> CCMR2 &= ~(TIM_CCMR2_OC3M); //clear bits
@@ -165,8 +160,9 @@ void ADC1_COMP_IRQHandler(void){
             real_pos = adc_val;  // PA5, Channel 5
             adc_channel = 0;
         }
+        ADC1->CHSELR = ADC_CHSELR_CHSEL0;  // Select channel 0        
         ADC1->CR |= ADC_CR_ADSTART; // Start next conversion
-        ADC1->ISR |= ADC_ISR_EOC;   // Clear EOC flag
+
     }
 }
 
